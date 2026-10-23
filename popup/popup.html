@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>WordCard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <span class="logo">译</span>
+    <nav>
+      <button id="tab-list" class="tab active" type="button">单词表</button>
+      <button id="tab-settings" class="tab" type="button">Settings</button>
+    </nav>
+  </header>
+
+  <!-- 视图 1：单词表（默认） -->
+  <section id="view-list" class="view">
+    <div id="list-empty" class="empty" hidden>
+      暂无收藏单词<br>
+      <span class="hint">在任意网页划词，点击小图标查看单词卡并收藏</span>
+    </div>
+    <ul id="fav-list"></ul>
+  </section>
+
+  <!-- 视图 2：单词卡详情 -->
+  <section id="view-card" class="view" hidden>
+    <button id="card-back" class="back" type="button">← 返回列表</button>
+    <div id="card-body"></div>
+  </section>
+
+  <!-- 视图 3：Settings -->
+  <section id="view-settings" class="view" hidden>
+    <form id="settings-form" autocomplete="off">
+      <label class="field">
+        <span>Base URL</span>
+        <input id="f-baseurl" type="text" placeholder="https://api.deepseek.com" spellcheck="false">
+      </label>
+      <label class="field">
+        <span>Model</span>
+        <input id="f-model" type="text" list="model-list" placeholder="deepseek-chat" spellcheck="false">
+        <datalist id="model-list">
+          <option value="deepseek-chat"></option>
+          <option value="deepseek-reasoner"></option>
+        </datalist>
+      </label>
+      <label class="field">
+        <span>API Key</span>
+        <input id="f-apikey" type="password" placeholder="sk-..." spellcheck="false">
+      </label>
+      <div class="row">
+        <button type="submit" class="primary">保存</button>
+        <button type="button" id="btn-test">测试连接</button>
+      </div>
+      <div id="settings-status" class="status"></div>
+      <p class="foot-note">Key 仅保存在本地浏览器（chrome.storage.local），不会上传到任何服务器。</p>
+    </form>
+  </section>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

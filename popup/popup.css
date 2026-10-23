@@ -1,0 +1,96 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  width: 340px;
+  font: 400 13px/1.6 -apple-system, "Segoe UI", system-ui, sans-serif;
+  color: #24242c;
+  background: #fff;
+}
+
+.top {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #ececF2;
+  background: #faf9fd;
+}
+.logo {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: #534AB7; color: #fff;
+  font: 500 13px/24px -apple-system, system-ui, sans-serif;
+  text-align: center;
+}
+nav { display: flex; gap: 4px; margin-left: auto; }
+.tab {
+  border: none; background: none; cursor: pointer;
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 13px; color: #6f6e7a;
+}
+.tab:hover { background: #eeedfe; }
+.tab.active { background: #534AB7; color: #fff; }
+
+.view { padding: 10px 14px 14px; max-height: 440px; overflow-y: auto; }
+
+/* ---- 单词表 ---- */
+#fav-list { list-style: none; }
+#fav-list li {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 8px 6px; border-radius: 8px; cursor: pointer;
+}
+#fav-list li:hover { background: #f5f4f8; }
+#fav-list .w { font-weight: 600; font-size: 14px; white-space: nowrap; }
+#fav-list .t {
+  color: #6f6e7a; font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  flex: 1; min-width: 0;
+}
+#fav-list .time { color: #a9a8b4; font-size: 11px; white-space: nowrap; }
+.empty { text-align: center; padding: 32px 0; color: #6f6e7a; }
+.empty .hint { font-size: 12px; color: #a9a8b4; }
+
+/* ---- 单词卡 ---- */
+.back {
+  border: none; background: none; cursor: pointer;
+  color: #534AB7; font-size: 12px; padding: 2px 0 8px;
+}
+.back:hover { text-decoration: underline; }
+.card .head { display: flex; align-items: center; gap: 8px; }
+.card .word { font-size: 18px; font-weight: 600; word-break: break-word; }
+.card .btn {
+  border: none; background: none; cursor: pointer; font-size: 15px;
+  padding: 4px; border-radius: 6px; color: #534AB7;
+}
+.card .btn:hover { background: #eeedfe; }
+.card .phon { margin-top: 2px; color: #6f6e7a; font-size: 12px; }
+.card .trans { margin-top: 8px; }
+.card .exs { margin-top: 10px; }
+.card .ex { background: #f5f4f8; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; }
+.card .ex .en { font-size: 12.5px; }
+.card .ex .zh { font-size: 12px; color: #6f6e7a; margin-top: 2px; }
+.card .unfav {
+  margin-top: 10px; width: 100%;
+  border: 1px solid #f0997b; background: #fff; color: #993C1D;
+  padding: 7px; border-radius: 8px; cursor: pointer; font-size: 13px;
+}
+.card .unfav:hover { background: #faece7; }
+
+/* ---- Settings ---- */
+.field { display: block; margin-bottom: 12px; }
+.field span { display: block; font-size: 12px; color: #6f6e7a; margin-bottom: 4px; }
+.field input {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid #d3d1e8; border-radius: 8px;
+  font-size: 13px; outline: none;
+}
+.field input:focus { border-color: #534AB7; }
+.row { display: flex; gap: 8px; }
+.row button {
+  flex: 1; padding: 8px; border-radius: 8px; cursor: pointer;
+  font-size: 13px; border: 1px solid #d3d1e8; background: #fff; color: #24242c;
+}
+.row button:hover { border-color: #534AB7; color: #534AB7; }
+.row .primary { background: #534AB7; border-color: #534AB7; color: #fff; }
+.row .primary:hover { background: #6a63d6; color: #fff; }
+.status { margin-top: 10px; font-size: 12px; min-height: 18px; }
+.status.ok { color: #0F6E56; }
+.status.err { color: #993C1D; }
+.foot-note { margin-top: 8px; font-size: 11px; color: #a9a8b4; }
