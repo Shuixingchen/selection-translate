@@ -1,5 +1,5 @@
 // popup/popup.js — 三视图：单词表（默认）/ 单词卡详情 / Settings
-import { getSettings, saveSettings, getFavorites, toggleFavorite } from "../storage/store.js";
+import { getSettings, saveSettings, getFavorites, toggleFavorite, isFavorited } from "../storage/store.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -68,6 +68,33 @@ async function renderList() {
   }
 }
 
+// ---------- 输入框翻译（与划词共用 LOOKUP / 卡片视图） ----------
+
+async function translateFromInput() {
+  const text = $("translate-input").value.trim();
+  if (!text) return;
+  showView("card");
+  $("card-body").innerHTML = '<div class="card"><div class="loading">查询中…</div></div>';
+  let resp;
+  try {
+    resp = await chrome.runtime.sendMessage({ type: "LOOKUP", text });
+  } catch (err) {
+    resp = { ok: false, error: "通信失败，请重新打开弹窗" };
+  }
+  if (!resp || !resp.ok) {
+    const msg = (resp && (resp.message || resp.error)) || "查询失败，请重试";
+    $("card-body").innerHTML = `<div class="card"><div class="loading err">${esc(msg)}</div></div>`;
+    return;
+  }
+  currentCard = resp.card;
+  renderCardView(resp.card, await isFavorited(resp.card.word));
+}
+
+$("btn-translate").addEventListener("click", translateFromInput);
+$("translate-input").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") translateFromInput();
+});
+
 // ---------- 单词卡详情 ----------
 
 function esc(s) {
@@ -76,7 +103,19 @@ function esc(s) {
   }[c]));
 }
 
-function renderCardView(card) {
+function renderCardView(card, favorited = true) {
+  // >30 字符 = 翻译模式：上原文、下译文，无收藏按钮（与划词卡片一致）
+  if (String(card.word || "").length > 30) {
+    const translation = (card.translation || []).join("\n");
+    $("card-body").innerHTML =
+      `<div class="card">` +
+      `<div class="trtag">翻译</div>` +
+      `<div class="trsrc">${esc(card.word)}</div>` +
+      `<div class="trdst">${esc(translation)}</div>` +
+      `</div>`;
+    return;
+  }
+
   const phon = [];
   if (card.phonetic && card.phonetic.us) phon.push("US " + esc(card.phonetic.us));
   if (card.phonetic && card.phonetic.uk) phon.push("UK " + esc(card.phonetic.uk));
@@ -111,10 +150,12 @@ function renderCardView(card) {
     } catch (e) { /* ignore */ }
   });
 
-  $("card-body").querySelector(".unfav").addEventListener("click", async () => {
-    await toggleFavorite(card);
-    renderList();
-    showView("list");
+  $("card-body").querySelector(".unfav").textContent = favorited ? "取消收藏" : "收藏";
+  $("card-body").querySelector(".unfav").classList.toggle("fav-mode", !favorited);
+  $("card-body").querySelector(".unfav").addEventListener("click", async (e) => {
+    const nowFavorited = await toggleFavorite(card);
+    e.target.textContent = nowFavorited ? "取消收藏" : "收藏";
+    e.target.classList.toggle("fav-mode", !nowFavorited);
   });
 }
 

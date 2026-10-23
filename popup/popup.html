@@ -7,7 +7,11 @@
 </head>
 <body>
   <header class="top">
-    <span class="logo">译</span>
+    <div class="top-row">
+      <span class="logo">译</span>
+      <input id="translate-input" type="text" placeholder="输入或粘贴文本，回车翻译" spellcheck="false">
+      <button id="btn-translate" class="tr-btn" type="button">翻译</button>
+    </div>
     <nav>
       <button id="tab-list" class="tab active" type="button">单词表</button>
       <button id="tab-settings" class="tab" type="button">Settings</button>
