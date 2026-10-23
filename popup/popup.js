@@ -84,6 +84,9 @@ function renderCardView(card) {
   const exs = (card.examples || [])
     .map((x) => `<div class="ex"><div class="en">${esc(x.en)}</div><div class="zh">${esc(x.zh)}</div></div>`)
     .join("");
+  const forms = (card.forms || [])
+    .map((f) => `<div class="frow"><span class="fpos">${esc(f.pos)}</span><span class="fword">${esc(f.word)}</span><span class="fmean">${esc(f.meaning)}</span></div>`)
+    .join("");
 
   $("card-body").innerHTML =
     `<div class="card">` +
@@ -94,6 +97,7 @@ function renderCardView(card) {
     (phon.length ? `<div class="phon">${phon.join(" · ")}</div>` : "") +
     `<div class="trans">${trans}</div>` +
     (exs ? `<div class="exs">${exs}</div>` : "") +
+    (forms ? `<div class="forms"><div class="ftitle">词形变化</div>${forms}</div>` : "") +
     `<button class="unfav" type="button">取消收藏</button>` +
     `</div>`;
 

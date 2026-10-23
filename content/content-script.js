@@ -65,6 +65,13 @@
       }
       .wc-ex .en { font-size: 12.5px; }
       .wc-ex .zh { font-size: 12px; color: #6f6e7a; margin-top: 2px; }
+      .wc-forms { margin-top: 10px; border-top: 1px dashed #e3e2ea; padding-top: 8px; }
+      .wc-ftitle { font-size: 11px; color: #a9a8b4; margin-bottom: 4px; }
+      .wc-frow { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; }
+      .wc-fpos { color: #534AB7; font-size: 12px; min-width: 30px; }
+      .wc-fword { color: #185FA5; cursor: pointer; font-weight: 500; }
+      .wc-fword:hover { text-decoration: underline; }
+      .wc-fmean { color: #6f6e7a; font-size: 12px; flex: 1; }
       .wc-state { padding: 18px 0; text-align: center; color: #6f6e7a; }
       .wc-state .spinner {
         display: inline-block; width: 14px; height: 14px; border-radius: 50%;
@@ -186,14 +193,16 @@
     cardEl.style.left = left + "px";
   }
 
-  async function openCard() {
-    if (!currentText || pending) return;
+  async function openCard(textOverride) {
+    const text = String(textOverride || currentText || "").trim();
+    if (!text || pending) return;
+    currentText = text;
     pending = true;
     hideIcon();
     cardEl.innerHTML = '<div class="wc-state"><span class="spinner"></span>查询中…</div>';
     positionCard();
     try {
-      const resp = await chrome.runtime.sendMessage({ type: "LOOKUP", text: currentText });
+      const resp = await chrome.runtime.sendMessage({ type: "LOOKUP", text: text });
       if (!resp || !resp.ok) {
         renderError((resp && (resp.message || resp.error)) || "查询失败，请重试");
         return;
@@ -229,6 +238,13 @@
     const exs = (card.examples || [])
       .map((x) => '<div class="wc-ex"><div class="en">' + esc(x.en) + '</div><div class="zh">' + esc(x.zh) + "</div></div>")
       .join("");
+    const forms = (card.forms || [])
+      .map((f) =>
+        '<div class="wc-frow"><span class="wc-fpos">' + esc(f.pos) + "</span>" +
+        '<span class="wc-fword" data-word="' + esc(f.word) + '">' + esc(f.word) + "</span>" +
+        '<span class="wc-fmean">' + esc(f.meaning) + "</span></div>"
+      )
+      .join("");
 
     cardEl.innerHTML =
       '<div class="wc-head">' +
@@ -238,10 +254,14 @@
       "</div>" +
       (phon.length ? '<div class="wc-phon">' + phon.join(" · ") + "</div>" : "") +
       '<div class="wc-trans">' + trans + "</div>" +
-      (exs ? '<div class="wc-exs">' + exs + "</div>" : "");
+      (exs ? '<div class="wc-exs">' + exs + "</div>" : "") +
+      (forms ? '<div class="wc-forms"><div class="wc-ftitle">词形变化（点击可查询）</div>' + forms + "</div>" : "");
 
     cardEl.querySelector(".wc-speak").addEventListener("click", () => speak(card.word));
     cardEl.querySelector(".wc-star").addEventListener("click", toggleStar);
+    cardEl.querySelectorAll(".wc-fword").forEach((el) =>
+      el.addEventListener("click", () => openCard(el.dataset.word))
+    );
     positionCard();
   }
 

@@ -5,11 +5,12 @@ const SYSTEM_PROMPT = [
   "You are a translation engine for a browser extension.",
   "The user selects an English word, phrase, or sentence.",
   "Reply with STRICT JSON only (no markdown, no extra text) matching this schema:",
-  '{"word":"...","phonetic":{"us":"...","uk":"..."},"translation":["..."],"examples":[{"en":"...","zh":"..."},...]}',
+  '{"word":"...","phonetic":{"us":"...","uk":"..."},"translation":["..."],"examples":[{"en":"...","zh":"..."},...],"forms":[{"pos":"v.","word":"...","meaning":"..."},...]}',
   "Rules:",
   "- The input may be any language. If it is English, translate into Simplified Chinese as described below. If it is Chinese (or another language), translate into natural English using the same schema.",
   "- If the input is a word or short phrase: translation = 1-4 dictionary-style entries in the target language, each with part of speech like \"v. 谈判，协商\"; examples = exactly 2 natural sentences; phonetic = IPA with slashes like \"/nɪˈɡoʊʃieɪt/\" (only for English input).",
   "- If the input is a sentence: translation = exactly 1 entry, the complete translation of the sentence (no part of speech); examples = empty array []; phonetic = empty strings.",
+  "- If the input is a single English word: forms = 2-6 related word forms and derivations (noun/verb/adjective/adverb variants, e.g. redemption -> redeem (v.), redemptive (adj.), redeemable (adj.)), each item {\"pos\":\"n.|v.|adj.|adv.\",\"word\":\"...\",\"meaning\":\"brief Simplified Chinese meaning\"}. Use empty array [] for sentences, phrases, or non-English input.",
   "- word: the looked-up text itself.",
   "The output must be valid json."
 ].join("\n");
@@ -129,6 +130,17 @@ function normalizeCard(raw, fallbackText) {
       .filter((x) => x && typeof x.en === "string" && x.en.trim())
       .map((x) => ({ en: x.en.trim(), zh: typeof x.zh === "string" ? x.zh.trim() : "" }))
       .slice(0, 2);
+  }
+  card.forms = [];
+  if (Array.isArray(raw.forms)) {
+    card.forms = raw.forms
+      .filter((f) => f && typeof f.word === "string" && f.word.trim())
+      .map((f) => ({
+        pos: typeof f.pos === "string" ? f.pos.trim() : "",
+        word: f.word.trim(),
+        meaning: typeof f.meaning === "string" ? f.meaning.trim() : ""
+      }))
+      .slice(0, 6);
   }
   if (!card.translation.length) {
     card.translation = ["（未获取到释义，请重试）"];

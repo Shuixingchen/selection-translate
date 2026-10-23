@@ -144,6 +144,10 @@ selection-translate/
   "examples": [
     { "en": "The two sides agreed to negotiate a settlement.", "zh": "双方同意通过谈判解决争端。" }
   ],
+  "forms": [
+    { "pos": "n.", "word": "negotiation", "meaning": "谈判，协商" },
+    { "pos": "adj.", "word": "negotiable", "meaning": "可协商的" }
+  ],
   "lookedUpAt": 1760000000000
 }
 ```
