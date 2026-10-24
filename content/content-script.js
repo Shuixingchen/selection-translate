@@ -52,6 +52,7 @@
       .wc-btn {
         border: none; background: none; cursor: pointer; font-size: 15px;
         line-height: 1; padding: 4px; border-radius: 6px; color: #534AB7;
+        display: inline-flex; align-items: center;
       }
       .wc-btn:hover { background: #eeedfe; }
       .wc-star { margin-left: auto; font-size: 18px; }
@@ -71,6 +72,7 @@
       .wc-fpos { color: #534AB7; font-size: 12px; min-width: 30px; }
       .wc-fword { color: #185FA5; cursor: pointer; font-weight: 500; }
       .wc-fword:hover { text-decoration: underline; }
+      .wc-fspeak { padding: 0 2px; line-height: 1; }
       .wc-fmean { color: #6f6e7a; font-size: 12px; flex: 1; }
       .wc-state { padding: 18px 0; text-align: center; color: #6f6e7a; }
       .wc-state .spinner {
@@ -87,6 +89,14 @@
 
   const icon = shadow.querySelector(".wc-icon");
   const cardEl = shadow.querySelector(".wc-card");
+
+  // 美式读音播放图标（矢量，替代 emoji）
+  const SPK_SVG =
+    '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">' +
+    '<path d="M2.5 6.2h2.2L8 3.2v9.6L4.7 9.8H2.5z" fill="currentColor"/>' +
+    '<path d="M10.3 5.7a3.2 3.2 0 0 1 0 4.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M12.2 4a5.6 5.6 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>' +
+    "</svg>";
 
   let currentText = "";
   let currentCard = null;
@@ -242,6 +252,7 @@
       .map((f) =>
         '<div class="wc-frow"><span class="wc-fpos">' + esc(f.pos) + "</span>" +
         '<span class="wc-fword" data-word="' + esc(f.word) + '">' + esc(f.word) + "</span>" +
+        '<button class="wc-btn wc-fspeak" data-word="' + esc(f.word) + '" title="播放发音">' + SPK_SVG + "</button>" +
         '<span class="wc-fmean">' + esc(f.meaning) + "</span></div>"
       )
       .join("");
@@ -249,7 +260,7 @@
     cardEl.innerHTML =
       '<div class="wc-head">' +
       '<span class="wc-word">' + esc(card.word) + "</span>" +
-      '<button class="wc-btn wc-speak" title="播放发音">🔊</button>' +
+      '<button class="wc-btn wc-speak" title="播放发音">' + SPK_SVG + "</button>" +
       '<button class="wc-btn wc-star" title="收藏 / 取消收藏">☆</button>' +
       "</div>" +
       (phon.length ? '<div class="wc-phon">' + phon.join(" · ") + "</div>" : "") +
@@ -261,6 +272,9 @@
     cardEl.querySelector(".wc-star").addEventListener("click", toggleStar);
     cardEl.querySelectorAll(".wc-fword").forEach((el) =>
       el.addEventListener("click", () => openCard(el.dataset.word))
+    );
+    cardEl.querySelectorAll(".wc-fspeak").forEach((el) =>
+      el.addEventListener("click", () => speak(el.dataset.word))
     );
     positionCard();
   }

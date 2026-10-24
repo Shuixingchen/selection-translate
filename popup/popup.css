@@ -72,6 +72,7 @@ nav { display: flex; gap: 4px; }
 .card .btn {
   border: none; background: none; cursor: pointer; font-size: 15px;
   padding: 4px; border-radius: 6px; color: #534AB7;
+  display: inline-flex; align-items: center;
 }
 .card .btn:hover { background: #eeedfe; }
 .card .phon { margin-top: 2px; color: #6f6e7a; font-size: 12px; }
@@ -84,7 +85,14 @@ nav { display: flex; gap: 4px; }
 .card .forms .ftitle { font-size: 11px; color: #a9a8b4; margin-bottom: 4px; }
 .card .frow { display: flex; align-items: baseline; gap: 6px; padding: 1px 0; }
 .card .fpos { color: #534AB7; font-size: 12px; min-width: 30px; }
-.card .fword { font-weight: 500; }
+.card .fword { font-weight: 500; color: #185FA5; cursor: pointer; }
+.card .fword:hover { text-decoration: underline; }
+.card .fspeak {
+  border: none; background: none; cursor: pointer;
+  padding: 0 2px; line-height: 1; color: #534AB7;
+  display: inline-flex; align-items: center;
+}
+.card .fspeak:hover { background: #eeedfe; border-radius: 4px; }
 .card .fmean { color: #6f6e7a; font-size: 12px; flex: 1; }
 .card .unfav {
   margin-top: 10px; width: 100%;
