@@ -1,5 +1,16 @@
-// popup/popup.js — 三视图：单词表（默认）/ 单词卡详情 / Settings
-import { getSettings, saveSettings, getFavorites, toggleFavorite, isFavorited } from "../storage/store.js";
+// popup/popup.js — 四视图：单词表（默认）/ 单词卡详情 / 背单词 / Settings
+import {
+  getSettings,
+  saveSettings,
+  getFavorites,
+  toggleFavorite,
+  isFavorited,
+  getFavoriteCard,
+  answerCurrent,
+  getReviewOverview,
+  resetReviewDay
+} from "../storage/store.js";
+import { createReviewView, renderReviewDone } from "../review/review-view.js";
 
 // 美式读音播放图标（矢量，替代 emoji）
 const SPK =
@@ -14,25 +25,34 @@ const $ = (id) => document.getElementById(id);
 const views = {
   list: $("view-list"),
   card: $("view-card"),
+  review: $("view-review"),
   settings: $("view-settings")
 };
-const tabs = { list: $("tab-list"), settings: $("tab-settings") };
+const tabs = { list: $("tab-list"), review: $("tab-review"), settings: $("tab-settings") };
 let currentCard = null;
 let cardHistory = []; // 词形连查的返回栈
+let reviewView = null; // 背单词会话实例
 
 // ---------- 视图切换 ----------
 
 function showView(name) {
   for (const k of Object.keys(views)) views[k].hidden = k !== name;
   tabs.list.classList.toggle("active", name === "list" || name === "card");
+  tabs.review.classList.toggle("active", name === "review");
   tabs.settings.classList.toggle("active", name === "settings");
 }
 
 tabs.list.addEventListener("click", () => {
+  destroyReview();
   renderList();
   showView("list");
 });
+tabs.review.addEventListener("click", () => {
+  showView("review");
+  showReviewOverview();
+});
 tabs.settings.addEventListener("click", () => {
+  destroyReview();
   loadSettingsForm();
   showView("settings");
 });
@@ -264,6 +284,106 @@ $("btn-test").addEventListener("click", async () => {
   }
   if (resp && resp.ok) setStatus(resp.message || "连接成功", "ok");
   else setStatus((resp && resp.error) || "连接失败", "err");
+});
+
+// ---------- 背单词 ----------
+
+function destroyReview() {
+  if (reviewView) {
+    reviewView.destroy();
+    reviewView = null;
+  }
+  $("review-session").hidden = true;
+  $("review-overview").hidden = false;
+}
+
+async function showReviewOverview() {
+  destroyReview();
+
+  const ov = await getReviewOverview();
+  $("ov-due").textContent = ov.due;
+  $("ov-known").textContent = ov.todayKnown;
+  $("ov-streak").textContent = ov.streak;
+  $("ov-meta").textContent =
+    "词库 " + ov.library + " 个 · 已掌握 " + ov.mastered + " 个";
+
+  const btn = $("btn-start-review");
+  const hint = $("ov-hint");
+
+  if (!ov.library) {
+    btn.disabled = true;
+    btn.textContent = "词库为空";
+    hint.textContent = "先在任意网页划词，收藏单词后即进入词库";
+    return;
+  }
+  if (ov.library > 0 && ov.mastered === ov.library) {
+    btn.disabled = true;
+    btn.textContent = "全部已掌握";
+    hint.textContent = "继续收藏新词，明天再来";
+    return;
+  }
+  if (!ov.due) {
+    btn.disabled = true;
+    btn.textContent = "今日已完成";
+    hint.textContent = "已连续 " + ov.streak + " 天 · 明天再来复习";
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = "开始背单词";
+  hint.textContent =
+    "预计 " + ov.minutes + " 分钟 · 到期复习优先，再补新词";
+}
+
+async function startReview(day) {
+  if (!day || !Array.isArray(day.queue) || !day.queue.length) {
+    showReviewOverview();
+    return;
+  }
+
+  $("review-overview").hidden = true;
+  $("review-session").hidden = false;
+
+  const settings = await getSettings();
+  const autoPlay = !(settings.review && settings.review.autoPlay === false);
+
+  if (reviewView) reviewView.destroy();
+  reviewView = createReviewView($("review-session"), {
+    getCard: getFavoriteCard,
+    answer: (knew) => answerCurrent(knew),
+    speak: speakWord,
+    autoPlay,
+    onExit: () => showReviewOverview(),
+    onComplete: (finishedDay) => showReviewDone(finishedDay)
+  });
+
+  await reviewView.start(day);
+}
+
+function showReviewDone(day) {
+  const root = $("review-session");
+  if (reviewView) {
+    reviewView.destroy();
+    reviewView = null;
+  }
+  root.hidden = false;
+  $("review-overview").hidden = true;
+
+  const panel = renderReviewDone(root, day);
+  panel.onAgain(async () => {
+    const next = await resetReviewDay();
+    if (!next || !Array.isArray(next.queue) || !next.queue.length) {
+      showReviewOverview();
+      return;
+    }
+    startReview(next);
+  });
+  panel.onBack(() => showReviewOverview());
+}
+
+$("btn-start-review").addEventListener("click", async () => {
+  const ov = await getReviewOverview();
+  await startReview(ov.day);
 });
 
 // ---------- 启动 ----------

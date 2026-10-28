@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "WordCard 画词翻译",
-  "version": "0.1.0",
-  "description": "选中文字，点击小图标查看单词卡：音标、读音、中文释义、例句，支持收藏。翻译由 DeepSeek 大模型驱动。",
+  "version": "0.2.0",
+  "description": "选中文字，点击小图标查看单词卡：音标、读音、中文释义、例句，支持收藏与艾宾浩斯背单词。翻译由 DeepSeek 大模型驱动。",
   "permissions": ["storage"],
   "host_permissions": ["https://*/*"],
   "background": {
@@ -13,7 +13,9 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content/content-script.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "action": {

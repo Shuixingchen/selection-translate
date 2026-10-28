@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>WordCard</title>
   <link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="../review/review.css">
 </head>
 <body>
   <header class="top">
@@ -14,6 +15,7 @@
     </div>
     <nav>
       <button id="tab-list" class="tab active" type="button">单词表</button>
+      <button id="tab-review" class="tab" type="button">背单词</button>
       <button id="tab-settings" class="tab" type="button">Settings</button>
     </nav>
   </header>
@@ -59,6 +61,31 @@
       <div id="settings-status" class="status"></div>
       <p class="foot-note">Key 仅保存在本地浏览器（chrome.storage.local），不会上传到任何服务器。</p>
     </form>
+  </section>
+
+  <!-- 视图 4：背单词 -->
+  <section id="view-review" class="view" hidden>
+    <div id="review-overview">
+      <div class="ov-grid">
+        <div class="ov-cell">
+          <div class="ov-num" id="ov-due">0</div>
+          <div class="ov-lbl">今日待背</div>
+        </div>
+        <div class="ov-cell">
+          <div class="ov-num" id="ov-known">0</div>
+          <div class="ov-lbl">今日已背</div>
+        </div>
+        <div class="ov-cell">
+          <div class="ov-num" id="ov-streak">0</div>
+          <div class="ov-lbl">连续天数</div>
+        </div>
+      </div>
+      <div class="ov-meta" id="ov-meta">词库 0 个单词</div>
+      <button id="btn-start-review" class="ov-start" type="button">开始背单词</button>
+      <div id="ov-hint" class="ov-hint"></div>
+    </div>
+
+    <div id="review-session" hidden></div>
   </section>
 
   <script type="module" src="popup.js"></script>

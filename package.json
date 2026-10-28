@@ -1,0 +1,10 @@
+{
+  "name": "wordcard",
+  "version": "0.2.0",
+  "private": true,
+  "description": "WordCard — 划词翻译 + 背单词 Chrome 扩展（无构建，原生 ES Module）",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/srs.test.mjs"
+  }
+}
